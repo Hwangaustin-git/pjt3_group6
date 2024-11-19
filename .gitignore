@@ -1,0 +1,33 @@
+# Python #
+##########
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.env
+
+# Virtual Environments #
+########################
+venv/
+env/
+
+# Jupyter Notebook #
+####################
+.ipynb_checkpoints/
+
+# Logs #
+########
+*.log
+
+# Data files #
+##############
+*.csv
+*.sqlite
+*.db
+*.json
+
+# IDE/Editor Settings #
+#######################
+.vscode/
+.idea/
+
