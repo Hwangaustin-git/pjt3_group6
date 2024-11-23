@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Data Visualization</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <h1>Weather Data Visualization</h1>
+    <form id="search-form">
+        <label for="location">Enter a Location:</label>
+        <input type="text" id="location" name="location" placeholder="City or Country" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="visualization"></div>
+    <div id="map"></div>
+    <div id="bar-chart"></div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
