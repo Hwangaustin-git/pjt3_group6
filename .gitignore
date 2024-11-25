@@ -19,13 +19,6 @@ env/
 ########
 *.log
 
-# Data files #
-##############
-*.csv
-*.sqlite
-*.db
-*.json
-
 # IDE/Editor Settings #
 #######################
 .vscode/
