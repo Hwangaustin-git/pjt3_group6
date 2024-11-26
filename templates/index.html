@@ -12,9 +12,9 @@
 </head>
 <body>
     <h1>Weather Data Visualization</h1>
-    <form id="search-form">
+    <form id="search-form" action="http://127.0.0.1:5000/api/weather" method="get">
         <label for="location">Enter a Location:</label>
-        <input type="text" id="location" name="location" placeholder="City or Country" required>
+        <input type="text" id="location" name="location_name" placeholder="City or Country" required>
         <button type="submit">Search</button>
     </form>
 
