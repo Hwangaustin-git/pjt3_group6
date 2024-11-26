@@ -38,16 +38,11 @@ def get_weather():
         query += " AND last_updated <= :end_date"
         params['end_date'] = end_date
 
-    # Fetch data from database
-    print(text(query))
-    print(params)
     # Fetch data from the database
     try:
         with engine.connect() as connection:
             result = connection.execute(text(query), params)
             rows = result.fetchall()
-            for row in rows:
-                print(row)  # Access columns by name
             data = [dict(row._mapping) for row in rows]
             return jsonify(data)
     except Exception as e:
