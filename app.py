@@ -54,22 +54,18 @@ def get_cities():
     """
     API endpoint to retrieve a list of all unique cities.
     """
-    # Construct SQL query
     query = "SELECT DISTINCT location_name FROM weather_data ORDER BY location_name ASC"
-    params = {}
-    
-  # Fetch data from the database
+
     try:
         with engine.connect() as connection:
-            result = connection.execute(text(query), params)
+            result = connection.execute(text(query))
             rows = result.fetchall()
-            data = [dict(row._mapping) for row in rows]
-            return jsonify(data)
+            # Access rows properly
+            cities = [row[0] for row in rows]  # Use tuple index to access the first column
+            return jsonify(cities)  # Return a list of city names
     except Exception as e:
         print(f"Database error: {e}")
-        return jsonify({"error": "An error occurred while fetching data."}), 500
-
-    return jsonify({'available_cities': city_list})
+        return jsonify({"error": "An error occurred while fetching cities."}), 500
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worldwide Weather Buddy</title>
+    <title>Weather Data Visualization</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
@@ -12,13 +12,17 @@
 </head>
 <body>
     <h1>Weather Data Visualization</h1>
-    <form id="search-form" action="http://127.0.0.1:5000/api/weather" method="get">
-        <label for="location">Enter a Location:</label>
-        <input type="text" id="location" name="location_name" placeholder="City or Country" required>
-        <button type="submit">Search</button>
+    <form id="dropdown-form">
+        <label for="city-dropdown">Select a City:</label>
+        <select id="city-dropdown" name="location_name">
+            <option value="" disabled selected>Select a city</option>
+        </select>
+        <button type="submit">View Data</button>
     </form>
-
     <div id="visualization"></div>
+    <div id="humidity-visualization"></div>
+    <div id="windspeed-visualization"></div>
+
     <div id="map"></div>
     <div id="bar-chart"></div>
 
