@@ -48,6 +48,28 @@ def get_weather():
     except Exception as e:
         print(f"Database error: {e}")
         return jsonify({"error": "An error occurred while fetching data."}), 500
+    
+@app.route('/api/cities', methods=['GET'])
+def get_cities():
+    """
+    API endpoint to retrieve a list of all unique cities.
+    """
+    # Construct SQL query
+    query = "SELECT DISTINCT location_name FROM weather_data ORDER BY location_name ASC"
+    params = {}
+    
+  # Fetch data from the database
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(text(query), params)
+            rows = result.fetchall()
+            data = [dict(row._mapping) for row in rows]
+            return jsonify(data)
+    except Exception as e:
+        print(f"Database error: {e}")
+        return jsonify({"error": "An error occurred while fetching data."}), 500
+
+    return jsonify({'available_cities': city_list})
 
 
 if __name__ == "__main__":
