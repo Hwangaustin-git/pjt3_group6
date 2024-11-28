@@ -9,7 +9,6 @@ function populateDropdown() {
             return response.json();
         })
         .then(cities => {
-            console.log("Fetched cities:", cities); // Log fetched cities
             const dropdown = document.getElementById('city-dropdown');
             dropdown.innerHTML = '<option value="" disabled selected>Select a city</option>'; // Reset dropdown
 
@@ -29,9 +28,25 @@ function populateDropdown() {
         });
 }
 
-// Function to sample data for better visualization
-function sampleData(data, step) {
-    return data.filter((_, index) => index % step === 0);
+// Function to calculate monthly averages
+function calculateMonthlyAverages(data) {
+    const monthlyData = {};
+    data.forEach(entry => {
+        const month = new Date(entry.last_updated).toLocaleString('default', { month: 'short', year: 'numeric' });
+        if (!monthlyData[month]) {
+            monthlyData[month] = { humidity: [], windSpeed: [] };
+        }
+        monthlyData[month].humidity.push(entry.humidity);
+        monthlyData[month].windSpeed.push(entry.wind_mph);
+    });
+
+    const averages = Object.keys(monthlyData).map(month => ({
+        month,
+        avgHumidity: (monthlyData[month].humidity.reduce((a, b) => a + b, 0) / monthlyData[month].humidity.length).toFixed(2),
+        avgWindSpeed: (monthlyData[month].windSpeed.reduce((a, b) => a + b, 0) / monthlyData[month].windSpeed.length).toFixed(2),
+    }));
+
+    return averages;
 }
 
 // Function to fetch and plot weather data
@@ -47,7 +62,7 @@ function fetchAndPlotWeather(location, startDate, endDate) {
             return response.json();
         })
         .then(data => {
-            console.log("Fetched weather data:", data); // Log the data
+            console.log("Fetched weather data:", data);
 
             if (data.length === 0) {
                 document.getElementById('humidity-visualization').innerHTML = '<p>No data available for the selected city and date range.</p>';
@@ -55,57 +70,69 @@ function fetchAndPlotWeather(location, startDate, endDate) {
                 return;
             }
 
-            // Process the data
-            const dates = data.map(entry => new Date(entry.last_updated).toLocaleString('default', { month: 'short', year: 'numeric' }));
-            const humidity = data.map(entry => entry.humidity);
-            const windSpeed = data.map(entry => entry.wind_mph);
+            // Calculate monthly averages
+            const averages = calculateMonthlyAverages(data);
 
-            // Sample the data for better visualization
-            const sampledDates = sampleData(dates, 5);  // Change 5 to adjust sampling frequency
-            const sampledHumidity = sampleData(humidity, 5);
-            const sampledWindSpeed = sampleData(windSpeed, 5);
+            // Prepare data for Humidity Plot
+            const months = averages.map(entry => entry.month);
+            const avgHumidity = averages.map(entry => entry.avgHumidity);
 
-            // Create traces for Humidity
             const humidityTrace = {
-                x: sampledDates,
-                y: sampledHumidity,
+                x: months,
+                y: avgHumidity,
                 mode: 'lines+markers',
-                name: 'Humidity (%)',
-                line: { color: 'blue', opacity: 0.6 },
-                marker: { size: 4, color: 'blue' }
+                name: 'Avg Humidity (%)',
+                line: { color: 'blue', width: 2 },
+                marker: { size: 6, color: 'blue' }
             };
 
-            // Create traces for Wind Speed
-            const windSpeedTrace = {
-                x: sampledDates,
-                y: sampledWindSpeed,
-                mode: 'lines+markers',
-                name: 'Wind Speed (mph)',
-                line: { color: 'green', opacity: 0.6 },
-                marker: { size: 4, color: 'green' }
+            const humidityGuidelineTrace = {
+                x: months,
+                y: Array(months.length).fill(60), // Optimal humidity guideline (example: 60%)
+                mode: 'lines',
+                name: 'Optimal Humidity (%)',
+                line: { color: 'gray', dash: 'dot' }
             };
 
-            // Define layouts for Humidity
             const layoutHumidity = {
-                title: `Humidity for ${location} (May 2024 - Nov 2024)`,
+                title: `Average Humidity for ${location} (May 2024 - Nov 2024)`,
                 xaxis: { title: 'Month' },
-                yaxis: { title: 'Humidity (%)', titlefont: { color: 'blue' }, tickfont: { color: 'blue' } },
+                yaxis: { title: 'Avg Humidity (%)', titlefont: { color: 'blue' }, tickfont: { color: 'blue' } },
                 width: 1000,
-                height: 300
+                height: 400
             };
 
-            // Define layouts for Wind Speed
+            // Prepare data for Wind Speed Plot
+            const avgWindSpeed = averages.map(entry => entry.avgWindSpeed);
+
+            const windSpeedTrace = {
+                x: months,
+                y: avgWindSpeed,
+                mode: 'lines+markers',
+                name: 'Avg Wind Speed (mph)',
+                line: { color: 'green', width: 2 },
+                marker: { size: 6, color: 'green' }
+            };
+
+            const windSpeedGuidelineTrace = {
+                x: months,
+                y: Array(months.length).fill(10), // Optimal wind speed guideline (example: 10 mph)
+                mode: 'lines',
+                name: 'Optimal Wind Speed (mph)',
+                line: { color: 'gray', dash: 'dot' }
+            };
+
             const layoutWindSpeed = {
-                title: `Wind Speed for ${location} (May 2024 - Nov 2024)`,
+                title: `Average Wind Speed for ${location} (May 2024 - Nov 2024)`,
                 xaxis: { title: 'Month' },
-                yaxis: { title: 'Wind Speed (mph)', titlefont: { color: 'green' }, tickfont: { color: 'green' } },
+                yaxis: { title: 'Avg Wind Speed (mph)', titlefont: { color: 'green' }, tickfont: { color: 'green' } },
                 width: 1000,
-                height: 300
+                height: 400
             };
 
             // Plot the graphs
-            Plotly.newPlot('humidity-visualization', [humidityTrace], layoutHumidity);
-            Plotly.newPlot('windspeed-visualization', [windSpeedTrace], layoutWindSpeed);
+            Plotly.newPlot('humidity-visualization', [humidityTrace, humidityGuidelineTrace], layoutHumidity);
+            Plotly.newPlot('windspeed-visualization', [windSpeedTrace, windSpeedGuidelineTrace], layoutWindSpeed);
         })
         .catch(error => {
             console.error("Error fetching or plotting weather data:", error);
@@ -118,11 +145,9 @@ function fetchAndPlotWeather(location, startDate, endDate) {
 document.getElementById('dropdown-form').addEventListener('submit', function (event) {
     event.preventDefault(); // Prevent form submission reload
 
-    // Get the selected city
     const dropdown = document.getElementById('city-dropdown');
     const location = dropdown.value;
 
-    // Define date range (May to November 2024)
     const startDate = "2024-05-01";
     const endDate = "2024-11-30";
 
@@ -131,7 +156,6 @@ document.getElementById('dropdown-form').addEventListener('submit', function (ev
         return;
     }
 
-    // Fetch and plot data
     fetchAndPlotWeather(location, startDate, endDate);
 });
 
