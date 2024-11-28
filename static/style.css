@@ -1,75 +1,85 @@
-#map {
-    width: 80%;
-    height: 400px;
-    margin: 20px auto;
-    border: 1px solid #ccc;
+/* General Page Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5; /* Light background for better readability */
 }
 
-#bar-chart {
-    width: 80%;
-    height: 400px;
-    margin: 20px auto;
-    text-align: center;
-}
-
+/* Title Styles */
 h1 {
     text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    color: #333; /* Darker text for emphasis */
 }
 
+/* Form (Dropdown) Styling */
 form {
     text-align: center;
+    margin-bottom: 20px;
 }
 
-/* Visualization container */
+/* Main Visualization Container */
 #visualization {
     display: flex;
     flex-direction: column; /* Stack graphs vertically */
     justify-content: center; /* Horizontally center graphs */
     align-items: center; /* Vertically center graphs */
-    margin: 20px auto; /* Center the container itself */
+    margin: 20px auto; /* Center container */
     width: 80%; /* Responsive width */
-    max-width: 1000px; /* Limit max width */
+    max-width: 1000px; /* Limit max width for larger screens */
     padding: 10px;
-    background: #f9f9f9; /* Subtle background */
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
-}
-
-
-/* Visualization container */
-#visualization {
-    display: flex;
-    flex-direction: column; /* Stack graphs vertically */
-    justify-content: center; 
-    align-items: center;  
-    margin: 20px auto;    
-    width: 80%;            
-    max-width: 1000px;     
-    padding: 10px;
-    background: #f9f9f9; /* Light background for better contrast */
+    background: #fff; /* White background for contrast */
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-}
-/* Individual graph styles */
-#humidity-visualization, #windspeed-visualization {
-    width: 100%; /* Full width within the container */
-    max-width: 1000px; /* Ensure consistency with parent container */
-    margin-bottom: 20px; /* Space between graphs */
-    text-align: center; /* Center content inside each graph */
+    border-radius: 8px; /* Smooth rounded corners */
 }
 
-/* Insights section */
+/* Individual Graph Styling */
+#temperature-visualization,
+#humidity-visualization,
+#windspeed-visualization {
+    width: 100%; /* Full width within the container */
+    max-width: 1000px; /* Consistent alignment with parent */
+    margin-bottom: 20px; /* Space between graphs */
+    text-align: center; /* Center graph content */
+}
+
+/* Insights Section Styling */
 #insights {
     text-align: center; /* Center align insights text */
     margin-top: 20px;
-    font-size: 1.2rem; /* Slightly larger font for emphasis */
-    color: #333; /* Darker text color */
+    font-size: 1.2rem; /* Slightly larger text for readability */
+    color: #333; /* Dark gray text for neutral contrast */
 }
 
-/* Ensure container alignment */
-html, body {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center entire content horizontally */
-    justify-content: flex-start; /* Align content to top */
+/* Footer Section (Optional) */
+footer {
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #666; /* Subtle footer text color */
+    background-color: #f5f5f5;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    #visualization {
+        width: 90%; /* Reduce width for smaller screens */
+    }
+
+    #temperature-visualization,
+    #humidity-visualization,
+    #windspeed-visualization {
+        margin-bottom: 15px; /* Reduce spacing for compact layouts */
+    }
+
+    h1 {
+        font-size: 1.5rem; /* Reduce title size for smaller screens */
+    }
+
+    #insights {
+        font-size: 1rem; /* Adjust insights font size */
+    }
 }

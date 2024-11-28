@@ -23,8 +23,6 @@ function populateDropdown() {
         })
         .catch(error => {
             console.error("Error populating dropdown:", error);
-            document.getElementById('humidity-visualization').innerHTML = '<p>Error loading cities.</p>';
-            document.getElementById('windspeed-visualization').innerHTML = '<p>Error loading cities.</p>';
         });
 }
 
@@ -34,16 +32,18 @@ function calculateMonthlyAverages(data) {
     data.forEach(entry => {
         const month = new Date(entry.last_updated).toLocaleString('default', { month: 'short', year: 'numeric' });
         if (!monthlyData[month]) {
-            monthlyData[month] = { humidity: [], windSpeed: [] };
+            monthlyData[month] = { humidity: [], windSpeed: [], temperature: [] };
         }
         monthlyData[month].humidity.push(entry.humidity);
         monthlyData[month].windSpeed.push(entry.wind_mph);
+        monthlyData[month].temperature.push(entry.temp_f); // Use temp_f for temperature
     });
 
     const averages = Object.keys(monthlyData).map(month => ({
         month,
         avgHumidity: (monthlyData[month].humidity.reduce((a, b) => a + b, 0) / monthlyData[month].humidity.length).toFixed(2),
         avgWindSpeed: (monthlyData[month].windSpeed.reduce((a, b) => a + b, 0) / monthlyData[month].windSpeed.length).toFixed(2),
+        avgTemperature: (monthlyData[month].temperature.reduce((a, b) => a + b, 0) / monthlyData[month].temperature.length).toFixed(2),
     }));
 
     return averages;
@@ -65,6 +65,7 @@ function fetchAndPlotWeather(location, startDate, endDate) {
             console.log("Fetched weather data:", data);
 
             if (data.length === 0) {
+                document.getElementById('temperature-visualization').innerHTML = '<p>No data available for the selected city and date range.</p>';
                 document.getElementById('humidity-visualization').innerHTML = '<p>No data available for the selected city and date range.</p>';
                 document.getElementById('windspeed-visualization').innerHTML = '<p>No data available for the selected city and date range.</p>';
                 return;
@@ -73,8 +74,39 @@ function fetchAndPlotWeather(location, startDate, endDate) {
             // Calculate monthly averages
             const averages = calculateMonthlyAverages(data);
 
-            // Prepare data for Humidity Plot
+            // Prepare data for Temperature Plot
             const months = averages.map(entry => entry.month);
+            const avgTemperature = averages.map(entry => entry.avgTemperature);
+
+            const temperatureTrace = {
+                x: months,
+                y: avgTemperature,
+                mode: 'lines+markers',
+                name: 'Avg Temperature (°F)',
+                line: { color: 'red', width: 2 },
+                marker: { size: 6, color: 'red' }
+            };
+
+            const temperatureGuidelineTrace = {
+                x: months,
+                y: Array(months.length).fill(70), // Optimal temperature guideline (example: 70°F)
+                mode: 'lines',
+                name: 'Optimal Temperature (°F)',
+                line: { color: 'gray', dash: 'dot' }
+            };
+
+            const layoutTemperature = {
+                title: `Average Temperature for ${location} (May 2024 - Nov 2024)`,
+                xaxis: { title: 'Month' },
+                yaxis: { title: 'Avg Temperature (°F)', titlefont: { color: 'red' }, tickfont: { color: 'red' } },
+                width: 1000,
+                height: 400
+            };
+
+            // Plot the Temperature graph
+            Plotly.newPlot('temperature-visualization', [temperatureTrace, temperatureGuidelineTrace], layoutTemperature);
+
+            // Prepare data for Humidity Plot
             const avgHumidity = averages.map(entry => entry.avgHumidity);
 
             const humidityTrace = {
@@ -131,11 +163,13 @@ function fetchAndPlotWeather(location, startDate, endDate) {
             };
 
             // Plot the graphs
+            Plotly.newPlot('temperature-visualization', [temperatureTrace, temperatureGuidelineTrace], layoutTemperature);
             Plotly.newPlot('humidity-visualization', [humidityTrace, humidityGuidelineTrace], layoutHumidity);
             Plotly.newPlot('windspeed-visualization', [windSpeedTrace, windSpeedGuidelineTrace], layoutWindSpeed);
         })
         .catch(error => {
             console.error("Error fetching or plotting weather data:", error);
+            document.getElementById('temperature-visualization').innerHTML = '<p>Error occurred while fetching temperature data.</p>';
             document.getElementById('humidity-visualization').innerHTML = '<p>Error occurred while fetching humidity data.</p>';
             document.getElementById('windspeed-visualization').innerHTML = '<p>Error occurred while fetching wind speed data.</p>';
         });
