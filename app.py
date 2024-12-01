@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, request, render_template
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
-
+import pandas as pd
+import geopandas as gpd
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -10,6 +11,19 @@ app = Flask(__name__)
 DATABASE_PATH = "data/weather_data.sqlite"
 DATABASE_URI = f"sqlite:///{DATABASE_PATH}"
 engine = create_engine(DATABASE_URI)
+
+# Load the CSV dataset for GeoDataFrame functionality
+average_weather = pd.read_csv("data/PostgreSQL_weatherdata.csv")
+average_weather['last_updated'] = pd.to_datetime(average_weather['last_updated'])
+average_weather['month'] = average_weather['last_updated'].dt.strftime('%B %Y')
+
+# Convert to GeoDataFrame
+gdf = gpd.GeoDataFrame(
+    average_weather,
+    geometry=gpd.points_from_xy(average_weather['longitude'], average_weather['latitude'])
+)
+gdf['last_updated'] = gdf['last_updated'].dt.strftime('%Y-%m-%d %H:%M:%S')
+gdf['search_field'] = gdf['country'] + " - " + gdf['location_name']
 
 @app.route("/")
 def index():
@@ -66,7 +80,18 @@ def get_cities():
     except Exception as e:
         print(f"Database error: {e}")
         return jsonify({"error": "An error occurred while fetching cities."}), 500
-
+    
+@app.route('/api/weather_data', methods=['GET'])
+def get_weather_data():
+    """
+    Serve weather data from the GeoDataFrame in GeoJSON format.
+    """
+    try:
+        geojson_data = gdf.to_json()
+        return jsonify(geojson_data)
+    except Exception as e:
+        print(f"GeoDataFrame error: {e}")
+        return jsonify({"error": "An error occurred while fetching GeoDataFrame data."}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

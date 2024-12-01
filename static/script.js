@@ -193,5 +193,80 @@ document.getElementById('dropdown-form').addEventListener('submit', function (ev
     fetchAndPlotWeather(location, startDate, endDate);
 });
 
+// Map Initialization and Interaction
+document.addEventListener("DOMContentLoaded", function () {
+    const map = L.map('map').setView([20, 0], 2); // Default map center and zoom
+    const tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    });
+    tileLayer.addTo(map);
+
+    const weatherLayer = L.layerGroup().addTo(map);
+    const monthDropdown = document.getElementById("month-dropdown");
+    const recenterButton = document.getElementById("recenter-button");
+
+    // Populate dropdown and fetch data
+    fetch('/api/weather_data')
+        .then(response => response.json())
+        .then(data => {
+            const weatherData = JSON.parse(data);
+
+            // Populate dropdown with unique months
+            const months = [...new Set(weatherData.features.map(f => f.properties.month))];
+            months.forEach(month => {
+                const option = document.createElement("option");
+                option.value = month;
+                option.textContent = month;
+                monthDropdown.appendChild(option);
+            });
+
+            // Function to update map based on selected month
+            const updateMap = () => {
+                const selectedMonth = monthDropdown.value;
+                const filteredFeatures = weatherData.features.filter(f => f.properties.month === selectedMonth);
+
+                // Clear existing markers
+                weatherLayer.clearLayers();
+
+                filteredFeatures.forEach(feature => {
+                    const coords = feature.geometry.coordinates.reverse(); // GeoJSON uses [lon, lat]
+                    const { country, location_name, temperature_fahrenheit, humidity } = feature.properties;
+
+                    const marker = L.marker(coords, {
+                        icon: L.divIcon({
+                            html: `<i class="fas fa-cloud" style="color:${getTemperatureColor(temperature_fahrenheit)}"></i>`,
+                            className: 'weather-marker',
+                        })
+                    }).bindPopup(`
+                        <b>Country:</b> ${country}<br>
+                        <b>Location:</b> ${location_name}<br>
+                        <b>Temperature:</b> ${temperature_fahrenheit}°F<br>
+                        <b>Humidity:</b> ${humidity}% 
+                    `);
+                    marker.addTo(weatherLayer);
+                });
+            };
+
+            // Initial map load
+            monthDropdown.addEventListener('change', updateMap);
+            updateMap();
+
+            // Recenter map
+            recenterButton.addEventListener('click', () => {
+                map.setView([20, 0], 2);
+            });
+        })
+        .catch(err => console.error("Error loading weather data:", err));
+
+    // Function to determine color based on temperature
+    const getTemperatureColor = (temp) => {
+        if (temp >= 90) return "red";
+        if (temp >= 70) return "orange";
+        if (temp >= 50) return "blue";
+        return "purple";
+    };
+});
+
 // Populate dropdown on page load
 document.addEventListener('DOMContentLoaded', populateDropdown);
