@@ -8,7 +8,7 @@
 * [Technologies](#Technologies)
 * [Usage](#Usage)
 * [Data Sources](#Data-Sources)
-* [Running Application Image](#unning-Application-Image)
+* [Running Application Image](#Running-Application-Image)
 * [Contributors](#Contributors)
 * [Questions](#Questions)
 * [References](#References)
