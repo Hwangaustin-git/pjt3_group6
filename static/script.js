@@ -1,4 +1,4 @@
-// Function to populate the dropdown menu with cities
+// Function to populate the dropdown menu with cities 
 function populateDropdown() {
     console.log("Populating dropdown menu...");
     fetch('/api/cities')
@@ -32,11 +32,12 @@ function calculateMonthlyAverages(data) {
     data.forEach(entry => {
         const month = new Date(entry.last_updated).toLocaleString('default', { month: 'short', year: 'numeric' });
         if (!monthlyData[month]) {
-            monthlyData[month] = { humidity: [], windSpeed: [], temperature: [] };
+            monthlyData[month] = { humidity: [], windSpeed: [], temperature: [], uvIndex: [] };
         }
         monthlyData[month].humidity.push(entry.humidity);
         monthlyData[month].windSpeed.push(entry.wind_mph);
         monthlyData[month].temperature.push(entry.temp_f); // Use temp_f for temperature
+        monthlyData[month].uvIndex.push(entry.uv_index); 
     });
 
     const averages = Object.keys(monthlyData).map(month => ({
@@ -44,6 +45,7 @@ function calculateMonthlyAverages(data) {
         avgHumidity: (monthlyData[month].humidity.reduce((a, b) => a + b, 0) / monthlyData[month].humidity.length).toFixed(2),
         avgWindSpeed: (monthlyData[month].windSpeed.reduce((a, b) => a + b, 0) / monthlyData[month].windSpeed.length).toFixed(2),
         avgTemperature: (monthlyData[month].temperature.reduce((a, b) => a + b, 0) / monthlyData[month].temperature.length).toFixed(2),
+        avgUVIndex: (monthlyData[month].uvIndex.reduce((a, b) => a + b, 0) / monthlyData[month].uvIndex.length).toFixed(2), // UV index average
     }));
 
     return averages;
@@ -68,6 +70,7 @@ function fetchAndPlotWeather(location, startDate, endDate) {
                 document.getElementById('temperature-visualization').innerHTML = '<p>No data available for the selected city and date range.</p>';
                 document.getElementById('humidity-visualization').innerHTML = '<p>No data available for the selected city and date range.</p>';
                 document.getElementById('windspeed-visualization').innerHTML = '<p>No data available for the selected city and date range.</p>';
+                document.getElementById('uvindex-visualization').innerHTML = '<p>No data available for the selected city and date range.</p>';
                 return;
             }
 
@@ -166,15 +169,42 @@ function fetchAndPlotWeather(location, startDate, endDate) {
             Plotly.newPlot('temperature-visualization', [temperatureTrace, temperatureGuidelineTrace], layoutTemperature);
             Plotly.newPlot('humidity-visualization', [humidityTrace, humidityGuidelineTrace], layoutHumidity);
             Plotly.newPlot('windspeed-visualization', [windSpeedTrace, windSpeedGuidelineTrace], layoutWindSpeed);
+
+            // Prepare data for UV Index Bubble Chart
+            const avgUVIndex = averages.map(entry => entry.avgUVIndex);
+
+            const uvIndexTrace = {
+                x: months,
+                y: avgUVIndex,
+                mode: 'markers',
+                name: 'Avg UV Index',
+                marker: {
+                    size: avgUVIndex.map(value => value * 10), // Size of bubbles based on UV index
+                    color: avgUVIndex,
+                    colorscale: 'YlOrRd',
+                    showscale: true
+                }
+            };
+
+            const layoutUVIndex = {
+                title: `Average UV Index for ${location} (May 2024 - Nov 2024)`,
+                xaxis: { title: 'Month' },
+                yaxis: { title: 'Avg UV Index' },
+                width: 1000,
+                height: 400
+            };
+
+            // Plot the UV Index Bubble Chart
+            Plotly.newPlot('uvindex-visualization', [uvIndexTrace], layoutUVIndex);
         })
         .catch(error => {
             console.error("Error fetching or plotting weather data:", error);
             document.getElementById('temperature-visualization').innerHTML = '<p>Error occurred while fetching temperature data.</p>';
             document.getElementById('humidity-visualization').innerHTML = '<p>Error occurred while fetching humidity data.</p>';
             document.getElementById('windspeed-visualization').innerHTML = '<p>Error occurred while fetching wind speed data.</p>';
+            document.getElementById('uvindex-visualization').innerHTML = '<p>Error occurred while fetching UV index data.</p>';
         });
 }
-
 // Handle form submission
 document.getElementById('dropdown-form').addEventListener('submit', function (event) {
     event.preventDefault(); // Prevent form submission reload
