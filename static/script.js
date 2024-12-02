@@ -1,7 +1,7 @@
 // Function to populate the dropdown menu with cities 
 function populateDropdown() {
     console.log("Populating dropdown menu...");
-    fetch('/api/cities')
+    fetch('http://127.0.0.1:5000/api/cities')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -53,7 +53,7 @@ function calculateMonthlyAverages(data) {
 
 // Function to fetch and plot weather data
 function fetchAndPlotWeather(location, startDate, endDate) {
-    const apiUrl = `/api/weather?location_name=${location}&start_date=${startDate}&end_date=${endDate}`;
+    const apiUrl = `http://127.0.0.1:5000/api/weather?location_name=${location}&start_date=${startDate}&end_date=${endDate}`;
     console.log("Fetching weather data from URL:", apiUrl);
 
     fetch(apiUrl)
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const recenterButton = document.getElementById("recenter-button");
 
     // Populate dropdown and fetch data
-    fetch('/api/weather_data')
+    fetch('http://127.0.0.1:5000/api/weather_data')
         .then(response => response.json())
         .then(data => {
             const weatherData = JSON.parse(data);

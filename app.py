@@ -3,9 +3,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 import pandas as pd
 import geopandas as gpd
+from flask_cors import CORS
 
 # Initialize the Flask app
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # SQLite database connection
 DATABASE_PATH = "data/weather_data.sqlite"
