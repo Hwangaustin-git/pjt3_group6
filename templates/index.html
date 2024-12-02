@@ -20,23 +20,23 @@
         <button type="submit">View Data</button>
     </form>
 
-    <!-- Visualization Section -->
-    <div id="visualization" class="box">
-        <div id="temperature-visualization"></div>
-        <div id="humidity-visualization"></div>
-        <div id="windspeed-visualization"></div>
-    </div>
 
-    <!-- Bar Chart Section -->
-    <section id="chart-section" class="box">
-        <h2>UV Index Visualization</h2>
-        <div id="uvindex-visualization" class="visualization-container"></div>
-    </section>
 
     <select id="month-dropdown"></select>
     <button id="recenter-button">Recenter Map</button>
     <div id="map" style="height: 500px;"></div>
-    
+ 
+    <!-- Visualization Section -->
+<div id="visualization" class="box">
+    <h2>Key Weather Data</h2>
+    <!-- All graphs will be inside one container -->
+    <div id="graphs-container">
+        <div id="temperature-visualization" class="graph"></div>
+        <div id="humidity-visualization" class="graph"></div>
+        <div id="windspeed-visualization" class="graph"></div>
+        <div id="uvindex-visualization" class="graph"></div>
+    </div>
+</div>   
     
 
     <script src="/static/script.js"></script>
