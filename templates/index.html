@@ -24,7 +24,74 @@
 
     <select id="month-dropdown"></select>
     <button id="recenter-button">Recenter Map</button>
-    <div id="map" style="height: 500px;"></div>
+    <div id="map" style="height: 500px; position: relative;">
+        <!-- Legend Component -->
+        <div id="legend" style="
+            position: absolute;
+            bottom: 30px; left: 30px; width: 110px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px; padding: 10px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+            font-family: Arial, sans-serif; font-size: 12px;
+            z-index: 1000;">
+            <div id="legend-header" style="cursor: pointer; font-weight: bold;">
+                Temperature ▼
+            </div>
+            <div id="legend-content" style="margin-top: 15px;">
+                <div><i class="fa fa-sun" style="color: red; margin-right: 7px;"></i> Above 90°F</div>
+                <div><i class="fa fa-cloud-sun" style="color: orange; margin-right: 7px;"></i> Above 70°F</div>
+                <div><i class="fa fa-cloud" style="color: blue; margin-right: 7px;"></i> Above 50°F</div>
+                <div><i class="fa fa-snowflake" style="color: purple; margin-right: 7px;"></i> Below 50°F</div>
+            </div>
+        </div>
+    
+        <!-- Spinner Component -->
+        <div style="
+            position: absolute;
+            top: 70px; right: 10px;
+            width: 60px; height: 60px;
+            z-index: 1000;">
+            <div style="
+                width: 45px; height: 45px;
+                border: 5px solid rgba(0, 128, 255, 0.2);
+                border-top: 5px solid rgba(0, 128, 255, 1);
+                border-radius: 50%;
+                animation: spin 2.0s linear infinite;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                color: rgba(0, 128, 255, 0.8);">
+                🌍
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        div:hover {
+            animation-play-state: paused; /* Pause rotation on hover */
+        }
+    </style>
+    
+    <script>
+        // Ensure the legend appears open by default
+        document.getElementById('legend-header').addEventListener('click', function() {
+            const content = document.getElementById('legend-content');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                this.innerHTML = 'Temperature ▼';
+            } else {
+                content.style.display = 'none';
+                this.innerHTML = 'Temperature ▲';
+            }
+        });
+    </script>
+    
  
     <!-- Visualization Section -->
 <div id="visualization" class="box">
