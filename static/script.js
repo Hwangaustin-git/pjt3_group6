@@ -225,7 +225,7 @@ document.getElementById('dropdown-form').addEventListener('submit', function (ev
 
 // Map Initialization and Interaction
 document.addEventListener("DOMContentLoaded", function () {
-    const map = L.map('map').setView([20, 0], 2); // Default map center and zoom
+    const map = L.map('map').setView([20, 0], 3); // Default map center and zoom
     const tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: '© OpenStreetMap contributors'
@@ -263,11 +263,36 @@ document.addEventListener("DOMContentLoaded", function () {
                     const coords = feature.geometry.coordinates.reverse(); // GeoJSON uses [lon, lat]
                     const { country, location_name, temperature_fahrenheit, humidity } = feature.properties;
 
-                    const marker = L.marker(coords, {
-                        icon: L.divIcon({
-                            html: `<i class="fas fa-cloud" style="color:${getTemperatureColor(temperature_fahrenheit)}"></i>`,
-                            className: 'weather-marker',
-                        })
+// Function to determine the icon and style based on temperature
+const getTemperatureIcon = (temp) => {
+    if (temp >= 90) {
+        return {
+            iconHtml: '<i class="fa fa-sun" style="color: red;"></i>',
+        };
+    } else if (temp >= 70) {
+        return {
+            iconHtml: '<i class="fa fa-cloud-sun" style="color: orange;"></i>',
+        };
+    } else if (temp >= 50) {
+        return {
+            iconHtml: '<i class="fa fa-cloud" style="color: blue;"></i>',
+        };
+    } else {
+        return {
+            iconHtml: '<i class="fa fa-snowflake" style="color: purple;"></i>',
+        };
+    }
+};
+
+// Updated marker creation code
+const marker = L.marker(coords, {
+    icon: L.divIcon({
+        html: getTemperatureIcon(temperature_fahrenheit).iconHtml,
+        className: 'weather-marker',
+        iconSize: [20, 20], // Adjust size if necessary
+        iconAnchor: [10, 10],
+        style: `color: ${getTemperatureIcon(temperature_fahrenheit).iconColor}`
+    })
                     }).bindPopup(`
                         <b>Country:</b> ${country}<br>
                         <b>Location:</b> ${location_name}<br>

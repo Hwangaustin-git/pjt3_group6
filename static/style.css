@@ -118,12 +118,5 @@ button {
     border-radius: 5px; /* Optional: adds rounded corners for styling */
 }
 
-.weather-marker {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.weather-marker i {
-    font-size: 10px; /* Adjust size */
-}
+
 
