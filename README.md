@@ -69,6 +69,8 @@ This project is a dynamic web-based dashboard that provides interactive visualiz
 
 ![Vacation Weather Guide](/data/VacationWeatherGuide.gif)
 
+![Weather Map Pandas](/data/WeatherMapPandas.gif)
+
 ## Contributors
 
 This project is a collaboration between:
